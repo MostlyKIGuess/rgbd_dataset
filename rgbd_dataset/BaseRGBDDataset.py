@@ -33,6 +33,7 @@ class BaseRGBDDataset(Dataset):
         cy: float = None,
         rgb_transform: Union[Callable, None] = None,
         depth_transform: Union[Callable, None] = None,
+        **kwargs,
     ):
         super().__init__()
         self.dataset_name = dataset_name
