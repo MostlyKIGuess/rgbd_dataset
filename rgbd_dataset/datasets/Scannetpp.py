@@ -5,10 +5,12 @@ from typing import List
 from natsort import natsorted
 import json
 from scipy.spatial.transform import Rotation
+from numpy.typing import NDArray
+
 
 from ..BaseRGBDDataset import BaseRGBDDataset
 from ..utils import invert_se3
-from ..utils import load_only_transforms
+from .nerfstudio_utils import load_only_transforms
 
 
 # This uses the ARK Kit Pose. See the other class for the COLMAP pose
@@ -235,6 +237,19 @@ class ScannetppDSLR(BaseRGBDDataset):
                 [0, 0, 1],
             ]
         )
+        colmap_cameras_path = (
+            self.base_path / "data" / self.scene / "dslr" / "colmap" / "cameras.txt"
+        )
+        with open(colmap_cameras_path, "r") as f:
+            for line in f:
+                if line.startswith("#") or len(line.strip()) == 0:
+                    continue
+                parts = line.strip().split()
+                if len(parts) < 5:
+                    continue
+                camera_id = parts[0]
+                camera_intrinsics[camera_id] = K
+
         # Use the same K for all camera IDs
         # for per-image intrinsics, modify here
         # For now, assign to all camera IDs found in images.txt
